@@ -1,0 +1,12 @@
+<aura:component>
+  <aura:attribute name="open" type="boolean" default="true" access="private" />
+  <aura:attribute name="messageGroup" type="Map" default="" access="public" />
+  <div class="{!join(' ', v.messageGroup.id, v.open ? 'open' : '')}">
+    <h3 onclick="{!c.toggleOpen}">{!v.messageGroup.id}</h3>
+    <ul>
+      <aura:iteration items="{!v.messageGroup.items}" var="item">
+        <li>{!item}</li>
+      </aura:iteration>
+    </ul>
+  </div>
+</aura:component>

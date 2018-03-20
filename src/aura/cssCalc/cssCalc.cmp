@@ -1,0 +1,11 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:hasRecordId" controller="CalculationController">
+	<!-- <aura:attribute name="NNCalculation" type="NN_Calculation__c" default="{'sobjectType' : 'NN_Calculation__c', 'DateSign__c': '','Total_Premium__c':2.44,'Product__c':'Smart'}"
+	 access="public" /> -->
+	<ltng:require styles="{!$Resource.nnCss + '/fonts.css'}" />
+	<ltng:require styles="{!$Resource.nnCss + '/global-variables.css'}" />
+	<div>
+		<c:cssCalcHeader />
+		<p class="TEMP-mock-content">Content</p>
+	</div>
+
+</aura:component>

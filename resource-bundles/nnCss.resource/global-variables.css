@@ -1,0 +1,18 @@
+:root {
+  --orange-light: #ee7f00;
+  --orange-medium: #ea650d;
+  --orange-dark: #e64415;
+
+  --red: #d0021b;
+  --red-dark: #b10216;
+
+  --grey-ultra-light: #f1edeb;
+  --grey-extra-light: #e5ded9;
+  --grey-light: #cac7c7;
+  --grey-medium: #999999;
+  --grey-dark: #666666;
+  --grey-extra-dark: #414141;
+
+  --dagny-display: "NNDagnyDisplayWebPro";
+  --dagny-text: "NNDagnyTextWeb";
+}

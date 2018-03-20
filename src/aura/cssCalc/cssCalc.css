@@ -1,0 +1,56 @@
+.THIS {
+  display: grid;
+  grid-template-columns: 1fr 990px 1fr;
+  align-content: start;
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: var(--dagny-text);
+  font-size: 16px;
+  color: #414141;
+}
+
+.THIS > * {
+  grid-column: 2;
+}
+
+.THIS h1,
+.THIS h2,
+.THIS h3,
+.THIS h4 {
+  font-family: var(--dagny-display);
+}
+
+.THIS .light {
+  color: var(--orange-light);
+}
+
+.THIS .medium {
+  color: var(--orange-medium);
+}
+
+.THIS .dark {
+  color: var(--orange-dark);
+}
+
+/* inputs and labels */
+
+.THIS .slds-form-element__label {
+  color: var(--grey-medium);
+  font-size: 15px;
+}
+
+.THIS .slds-select {
+  border-color: var(--grey-extra-light);
+}
+
+.THIS .slds-select_container:before {
+  display: none;
+}
+
+.THIS .slds-select_container:after {
+  border-left-width: 6px;
+  border-right-width: 6px;
+  border-top: 6px solid var(--orange-medium);
+  bottom: calc(50% - 4px);
+  right: 12px;
+}

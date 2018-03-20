@@ -1,0 +1,58 @@
+/* messages */
+
+.THIS > ul {
+  display: none;
+  background-color: var(--grey-ultra-light);
+  border: 1px solid var(--grey-extra-light);
+  border-radius: 4px;
+  list-style: disc;
+  padding: 4px 24px;
+}
+
+.THIS.open > ul {
+  display: block;
+}
+
+.THIS h3 {
+  display: flex;
+  align-items: center;
+  color: var(--grey-dark);
+  cursor: pointer;
+}
+
+.THIS h3::after {
+  content: "";
+  display: block;
+  margin-left: 5px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-left-width: 6px;
+  border-right-width: 6px;
+  border-top: 6px solid var(--grey-dark);
+}
+
+.THIS.open h3::after {
+  transform: rotate(0.5turn);
+}
+
+/* messages error and warning states */
+
+.THIS.error ul {
+  color: #ffffff;
+  background-color: var(--red);
+  border-color: var(--red-dark);
+}
+
+.THIS.warning ul {
+  color: #ffffff;
+  background-color: var(--orange-medium);
+  border-color: var(--orange-dark);
+}
+
+.THIS.error h3 {
+  color: var(--red);
+}
+
+.THIS.warning h3 {
+  color: var(--orange-medium);
+}

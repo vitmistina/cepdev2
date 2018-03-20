@@ -1,0 +1,423 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction,lightning:actionOverride"
+    controller="CalculationController">
+    <ltng:require styles="{!$Resource.nnCss + '/fonts.css'}" />
+    <ltng:require styles="{!$Resource.nnCss + '/global-variables.css'}" />
+    <ltng:require styles="{! $Resource.select2 + '/select2-4.0.3/dist/css/select2.min.css'}" scripts="{!join(',',
+                          $Resource.jquery224 ,
+                          $Resource.select2 + '/select2-4.0.3/dist/js/select2.js')
+                          }" afterScriptsLoaded="{!c.scriptsLoaded}" />
+    <aura:attribute name="recordId" type="String" access="public" />
+    <aura:attribute name="accId" type="String" access="global" />
+    <aura:attribute name="isAnonymous" type="Boolean" default="false" />
+
+    <aura:attribute name="currentStep" type="Integer" default="1" access="private" />
+    <aura:attribute name="isChildren" type="Boolean" default="false" access="public" />
+    <aura:attribute name="isSecondInsured" type="Boolean" default="false" access="public" />
+    <aura:attribute name="isNotFirst" type="Boolean" default="false" access="private" />
+
+    <aura:attribute name="paymentFrequencyOptions" type="List" access="private" default="Red,Green,Blue" />
+    <aura:attribute name="productOptions" type="List" access="public" default="Red,Green,Blue" />
+    <aura:attribute name="selectedProduct" type="String" access="public" default="NN" />
+    <aura:attribute name="employmentTypes" type="List" access="private" default="Red,Green,Blue" />
+    <aura:attribute name="sportOptions" type="List" access="public" />
+    <aura:attribute name="investmentStrategies" type="List" access="public" />
+    <aura:attribute name="investmentVariants" type="List" access="public" />
+    <aura:attribute name="investmentFrequencies" type="List" access="public" />
+    <aura:attribute name="insuranceVariants" type="List" access="public" />
+    <aura:attribute name="specialGroups" type="List" access="public" />
+    <!--aura:attribute name="occupationOptions" type="List" access="public"/-->
+
+    <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
+    <aura:attribute name="remainingFunds" type="Decimal" access="global" default="100" />
+
+    <aura:attribute name="NNCalculation" type="NN_Calculation__c" default="{'sobjectType' : 'NN_Calculation__c', 'DateSign__c': ''}"
+        access="public" />
+
+    <aura:attribute name="policyHolder" type="Account" access="public" default="{'sobjectType' : 'Account'}" />
+    <aura:attribute name="firstInsured" type="Account" access="public" default="{'sobjectType' : 'Account'}" />
+    <aura:attribute name="secondInsured" type="Account" access="public" default="{'sobjectType' : 'Account'}" />
+
+    <aura:attribute name="childrenRiders" type="Component__c[]" access="global" />
+    <aura:attribute name="children" type="CalculationController.ChildWrapper[]" access="global" />
+
+    <aura:attribute name="componentsFirstLong" type="Component__c[]" access="global" />
+    <aura:attribute name="componentsFirstShort" type="Component__c[]" access="global" />
+    <aura:attribute name="componentsFirstDeath" type="Component__c[]" access="global" />
+
+    <aura:attribute name="componentsSecondLong" type="Component__c[]" access="global" />
+    <aura:attribute name="componentsSecondShort" type="Component__c[]" access="global" />
+    <aura:attribute name="componentsForSecond" type="Component__c[]" access="global" />
+
+    <aura:attribute name="firstInsuredRelation" type="NNRelationship__c" access="public" default="{'sobjectType' : 'NNRelationship__c'}"
+    />
+    <aura:attribute name="secondInsuredRelation" type="NNRelationship__c" access="public" default="{'sobjectType' : 'NNRelationship__c'}"
+    />
+    <aura:attribute name="policyHolderRelation" type="NNRelationship__c" access="public" default="{'sobjectType' : 'NNRelationship__c'}"
+    />
+
+    <aura:attribute name="chartReady" type="Boolean" access="global" default="false" />
+
+    <aura:handler name="change" value="{!v.currentStep}" action="{!c.changeStep}" />
+    <aura:handler name="change" value="{!v.isChildren}" action="{!c.isChildrenChanged}" />
+    <aura:handler name="change" value="{!v.isSecondInsured}" action="{!c.isSecondInsuredChanged}" />
+    <aura:handler name="change" value="{!v.isNotFirst}" action="{!c.isNotFirstChanged}" />
+
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+
+    <aura:attribute name="toggleSpinner" type="boolean" default="true" />
+
+    <aura:attribute access="public" type="String[]" name="errorMessages" />
+    <aura:attribute access="public" type="String[]" name="infoMessages" />
+    <aura:attribute access="public" type="String[]" name="warningMessages" />
+    <aura:attribute access="public" type="String[]" name="autoCorrectMessages" />
+
+    <aura:attribute access="global" type="Fund__c[]" name="fundsList" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:handler name="getNetIncome" event="c:CalculationGetNetIncomeEvent" action="{!c.handleGetNetIncome}" />
+    <aura:registerEvent name="validateFields" type="c:CalculationValidateFormPersonEvent" />
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner_medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+    <div class="slds-grid">
+        <c:cssCalcHeader NNCalculation="{!v.NNCalculation}" selectedProduct="{!v.selectedProduct}" recalculateRequired="{!v.recalculateRequired}"
+        />
+        <div class="slds-size_1-of-1 slds-medium-size_2-of-3 slds-large-size_2-of-3 slds-p-horizontal_small">
+            <h1 style="margin-top:20px">
+                <span class="nnLightOrange">Kalkulace </span>
+                <span class="nnMediumOrange">pojištění</span>
+            </h1>
+            <lightning:input type="checkbox" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
+            />
+            <div class="calculationMain">
+                <c:CalculationStep title="" aura:id="step1" class="slds-form" stepId="1" currentStep="{!v.currentStep}">
+                    <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.NNCalculation.CalculationName__c}"
+                        required="true" aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" />
+                    <lightning:select label="Speciální skupina" name="SpecialGroup">
+                        <aura:iteration items="{!v.specialGroups}" var="option">
+                            <option value="{!option.value}">{!option.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select label="Produkt" name="Product" value="{!v.NNCalculation.Product__c}" onchange="{!c.handleProductChange}">
+                        <aura:iteration items="{!v.productOptions}" var="option">
+                            <option value="{!option.value}">{!option.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
+                                formatter="" onchange="{!c.showOrHideRecalculate}" />
+                        </div>
+                        <div class="slds-col slds-p-left_small">
+                            <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
+                                onchange="{!c.showOrHideRecalculate}" />
+                        </div>
+                    </div>
+                    <lightning:select label="Frekvence plateb" name="PaymentFrequention" value="{!v.NNCalculation.PaymentFrequency__c}" onchange="{!c.showOrHideRecalculate}">
+                        <aura:iteration items="{!v.paymentFrequencyOptions}" var="option">
+                            <option value="{!option.value}" selected="{!option.selected}">{!option.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select label="Varianta sazeb pojistného" name="InsuranceVariant" value="{!v.NNCalculation.Insurance_Variant__c}"
+                        onchange="{!c.showOrHideRecalculate}">
+                        <aura:iteration items="{!v.insuranceVariants}" var="option">
+                            <option value="{!option.value}" selected="{!option.selected}">{!option.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input type="checkbox" label="Pojistit dítě" value="{!v.isChildren}" name="InsureChild" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
+                            />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input type="checkbox" label="Pojistit druhou osobu" value="{!v.isSecondInsured}" name="InsureSecondPerson" aura:id="isSecond"
+                                checked="{!v.NNCalculation.Has_Second_Insured__c}" />
+                        </div>
+                    </div>
+                </c:CalculationStep>
+
+                <c:CalculationStep title="První pojištěný - Informace" aura:id="step2" class="slds-hide slds-form" stepId="2" currentStep="{!v.currentStep}">
+
+                    <lightning:accordion activeSectionName="b">
+                        <lightning:accordionSection name="b" label="Pojistník">
+
+                            <c:CalculationFormPerson labelFirstName="Jméno pojistníka" labelLastName="Příjmení pojistníka" labelBirthday="Datum narození pojistníka"
+                                labelEmploymentType="Pracovní poměr pojistníka" acc="{!v.firstInsured}" personType="firstInsured"
+                                employmentTypesInner="{!v.employmentTypes}" aura:id="firstInsuredPersonForm" requiredRecalculate="{!v.recalculateRequired}"
+                                calculation="{!v.NNCalculation}" />
+
+                            <c:CalculationFormProfession labelInput="Zadejte povolání pojistníka" labelSearch="Hledat povolání" acc="{!v.firstInsured}"
+                            />
+
+                            <c:CalculationFormSport labelInput="Zadejte sport, který provozujete" labelSearch="Hledat sport" picklistOptsList="{!v.sportOptions}"
+                                acc="{!v.firstInsured}" sportIdentifier="sportFirstInsured" />
+
+                            <c:CalculationFormIncome acc="{!v.firstInsured}" />
+                        </lightning:accordionSection>
+                    </lightning:accordion>
+                    <lightning:input type="checkbox" label="Pojistník není první pojištěný" checked="{!v.NNCalculation.Insurer_Is_Not_First_Insured__c}"
+                        name="InsurerNotFirstInsured" aura:id="InsurerNotFirstInsured" onchange="{!c.isNotFirstChanged}" />
+                    <lightning:accordion activeSectionName="a" aura:id="insuredSection" class="slds-hide">
+                        <lightning:accordionSection name="a" label="Pojištěný">
+                            <c:CalculationFormPerson labelFirstName="Jméno" labelLastName="Příjmení" labelBirthday="Datum narození" labelEmploymentType="Pracovní poměr"
+                                acc="{!v.policyHolder}" personType="policyHolder" employmentTypesInner="{!v.employmentTypes}"
+                                requiredRecalculate="{!v.recalculateRequired}" calculation="{!v.NNCalculation}" />
+
+
+                            <c:CalculationFormProfession labelInput="Zadejte povolání pojištěného" labelSearch="Hledat povolání" />
+                        </lightning:accordionSection>
+                    </lightning:accordion>
+                </c:CalculationStep>
+
+
+                <c:CalculationStep title="První pojištěný - Výběr komponenty" aura:id="step3" class="slds-hide slds-form" stepId="3">
+                    <c:CalculationFormQuestions requiredRecalculate="{!v.recalculateRequired}" componentsDeath="{!v.componentsFirstDeath}" componentsLong="{!v.componentsFirstLong}"
+                        componentsShort="{!v.componentsFirstShort}" />
+                </c:CalculationStep>
+
+                <c:CalculationStep title="Druhý pojištěný - Informace" aura:id="step4" class="slds-hide slds-form" stepId="4">
+                    <lightning:accordion activeSectionName="b">
+                        <lightning:accordionSection name="b" label="2. pojištěný">
+
+                            <c:CalculationFormPerson labelFirstName="Jméno" labelLastName="Příjmení" labelBirthday="Datum narozen" labelEmploymentType="Pracovní poměr"
+                                acc="{!v.secondInsured}" personType="secondInsured" employmentTypesInner="{!v.employmentTypes}"
+                                aura:id="secondInsuredPersonForm" requiredRecalculate="{!v.recalculateRequired}" calculation="{!v.NNCalculation}"
+                            />
+                            <c:CalculationFormProfession labelInput="Zadejte povolání druhého pojištěného" labelSearch="Hledat povolání" acc="{!v.secondInsured}"
+                            />
+                            <c:CalculationFormSport labelInput="Zadejte sport, který provozujete" labelSearch="Hledat sport" picklistOptsList="{!v.sportOptions}"
+                                acc="{!v.secondInsured}" sportIdentifier="sportSecondInsured" />
+
+                            <c:CalculationFormIncome acc="{!v.secondInsured}" />
+                        </lightning:accordionSection>
+                    </lightning:accordion>
+                </c:CalculationStep>
+
+                <c:CalculationStep title="Druhý pojištěný - Výběr komponenty" aura:id="step5" class="slds-hide slds-form" stepId="5">
+                    <c:CalculationFormQuestions requiredRecalculate="{!v.recalculateRequired}" componentsDeath="{!v.componentsForSecond}" componentsLong="{!v.componentsSecondLong}"
+                        componentsShort="{!v.componentsSecondShort}" />
+                </c:CalculationStep>
+
+                <c:CalculationStep title="Informace o dítěti" aura:id="step6" class="slds-hide slds-form" stepId="6">
+                    <c:CalculationFormChildren children="{!v.children}" childrenComponents="{!v.childrenRiders}" requiredRecalculate="{!v.recalculateRequired}"
+                        calculation="{!v.NNCalculation}" />
+                </c:CalculationStep>
+                <c:CalculationStep title="Ilustrácie - investicie" aura:id="step7" class="slds-hide slds-form" stepId="7">
+                    <lightning:select label="Investicna strategia" name="investmentStrategy" value="{!v.NNCalculation.Investment_Strategy__c}"
+                        required="true" onchange="{!c.recalculateFunds}">
+                        <option value=""></option>
+                        <aura:iteration items="{!v.investmentStrategies}" var="option">
+                            <option value="{!option.value}">{!option.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <aura:if isTrue="{!v.NNCalculation.Investment_Strategy__c == 'DEFINED'}">
+                        <lightning:select label="Variant" name="investmentVariant" value="{!v.NNCalculation.Investment_Variant__c}" required="true">
+                            <option value=""></option>
+                            <aura:iteration items="{!v.investmentVariants}" var="option">
+                                <option value="{!option.value}">{!option.label}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </aura:if>
+                    <aura:if isTrue="{!v.NNCalculation.Investment_Strategy__c == 'OWN'}">
+                        <span>Očakávaný výnos</span>
+                        <br/>
+                        <lightning:formattedNumber value="{!v.remainingFunds}" style="decimal" />
+                        <span>%</span>
+                        <aura:if isTrue="{!v.remainingFunds != 0}">
+                            <span>Podíl fondů obsahuje neplatnout hodnotu</span>
+                        </aura:if>
+                        <aura:iteration items="{!v.fundsList}" var="option">
+                            <div class="slds-grid">
+                                <div class="slds-col slds-large-size_4-of-12">
+                                    <span>{!option.Fund_Name__c}</span>
+                                    <br/>
+                                    <span>{!option.FundCode__c}</span>
+                                </div>
+                                <div class="slds-col slds-large-size_4-of-12">
+                                    <span>Očakávaný výnos</span>
+                                    <br/>
+                                    <lightning:formattedNumber value="{!option.Expected_Profit__c}" style="percent" maximumFractionDigits="2" />
+                                </div>
+                                <div class="slds-col slds-large-size_4-of-12">
+                                    <lightning:input aura:id="fundSharing" label="Podil" value="{!option.Sharing__c}" onchange="{!c.showOrHideRecalculateFunds}"
+                                        type="number" min="0" max="100" formatter="percent-fixed" name="sharing" />
+                                </div>
+                            </div>
+                        </aura:iteration>
+                    </aura:if>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <lightning:input type="text" label="Očakávaný zisk (%)" name="expectedYield" disabled="true" value="{!v.NNCalculation.Expected_Yield__c}"
+                            />
+                        </div>
+                        <div class="slds-col slds-p-left_small">
+                            <lightning:input type="number" label="Poistná hodnota na konci" name="totalFundValue" value="{!v.NNCalculation.Total_Fund_Value__c}"
+                                formatter="currency" disabled="true" step="0.01" />
+                        </div>
+                    </div>
+                    <lightning:input type="checkbox" label="Vložiť mimoriadne poistné" name="insertExtraPayment" value="{!v.NNCalculation.Insert_Extra_Insurance__c}"
+                        checked="{!v.NNCalculation.Insert_Extra_Insurance__c}" />
+
+                    <aura:if isTrue="{!v.NNCalculation.Insert_Extra_Insurance__c == true}">
+                        <ui:inputCurrency label="Vklad" value="{!v.NNCalculation.Insert_Sum_Extra__c}" format=".00 €" />
+                        <lightning:select label="Frekvencia" name="frequencyExtra" value="{!v.NNCalculation.Investment_Frequency_Extra__c}" required="true">
+                            <aura:iteration items="{!v.investmentFrequencies}" var="option">
+                                <option value="{!option.value}" selected="{!option.selected}">{!option.label}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <lightning:input type="date" label="Začátek ukládání" name="startSaving" value="{!v.NNCalculation.Start_Saving_Extra__c}"
+                                />
+                            </div>
+                            <div class="slds-col slds-p-left_small">
+                                <lightning:input type="number" label="Doba ukladania" name="termSaving" step="1" value="{!v.NNCalculation.Term_Saving__c}"
+                                />
+                            </div>
+                        </div>
+                        <lightning:input type="checkbox" label="Do konca zmluvy" name="tillTheEnd" />
+                    </aura:if>
+                </c:CalculationStep>
+
+                <c:CalculationStep title="Ilustrace - Detail" aura:id="step8" class="slds-hide slds-form" stepId="8">
+                    <lightning:input type="radio" label="Pojištění" name="Insurance" value="Insurance" checked="true" />
+                    <lightning:input type="radio" label="Připojištění" name="AdditionalInsurance" value="AdditionalInsurance" />
+                    <lightning:input type="radio" label="Graf" name="Graph" value="Graph" checked="true" />
+                    <lightning:input type="radio" label="Vývoj" name="Development" value="Development" />
+                    <aura:if isTrue="{!v.chartReady}">
+                        <iframe src="{!'https://bttest002-nn-sales.cs85.force.com/testCalc/apex/IllustrationChart?id=' + v.NNCalculation.Id}" width="650"
+                            height="400" />
+                    </aura:if>
+                </c:CalculationStep>
+
+                <c:CalculationStep title="Shrnutí" aura:id="step9" class="slds-hide slds-form" stepId="9">
+                    <h2>Krytie prvého poisteného</h2>
+                    <c:CalculationSummaryRow componentsList="{!v.componentsFirstDeath}" isChildren="false" />
+                    <c:CalculationSummaryRow componentsList="{!v.componentsFirstLong}" isChildren="false" />
+                    <c:CalculationSummaryRow componentsList="{!v.componentsFirstShort}" isChildren="false" />
+                    <h2>Krytie druhého poisteného</h2>
+                    <c:CalculationSummaryRow componentsList="{!v.componentsForSecond}" isChildren="false" />
+                    <c:CalculationSummaryRow componentsList="{!v.componentsSecondLong}" isChildren="false" />
+                    <c:CalculationSummaryRow componentsList="{!v.componentsSecondShort}" isChildren="false" />
+                    <h2>Poistené deti</h2>
+                    <aura:iteration items="{!v.children}" var="child" indexVar="index">
+                        <span>{!index + 1}. Dieťa</span>
+                        <br/>
+                        <c:CalculationSummaryRow componentsList="{!child.components}" isChildren="true" />
+                    </aura:iteration>
+                </c:CalculationStep>
+
+                <div class="slds-text-align_right slds-p-top_small">
+                    <lightning:button label="Předchozí" disabled="true" aura:id="prev" onclick="{!c.prev}" />
+                    <aura:if isTrue="{!!v.recalculateRequired}">
+                        <lightning:button label="Další" variant="brand" aura:id="next" onclick="{!c.next}" />
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-large-size_1-of-3 slds-p-horizontal_small">
+            <lightning:card class="shoppingCartCard">
+                <aura:set attribute="title">
+                    Pojistné:
+                    <ui:outputCurrency value="{!v.NNCalculation.Total_Premium__c}" currencyCode="EUR" currencySymbol="€" format=".00 €" />
+                </aura:set>
+                <!--</lightning:card>-->
+                <!--<lightning:card >-->
+                <aura:set attribute="footer">
+                    <aura:if isTrue="{!v.recalculateRequired}">
+                        <lightning:button aura:id="recalculateButton" variant="brand" label="Přepočítat" onclick="{!c.recalculate}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.currentStep == 9}">
+                        <lightning:button label="Vytvořit smlouvu " />
+                    </aura:if>
+                    <aura:if isTrue="{!v.currentStep == 9}">
+                        <lightning:button label="Zobrazit PDF " onclick="{!c.openPDF}" />
+                    </aura:if>
+                    <lightning:button label="Otevřít košík 🛒" />
+                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-positive">
+                        <aura:iteration items="{!v.infoMessages}" var="mess">
+                            {!mess}
+                            <br/>
+                        </aura:iteration>
+                    </p>
+                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-negative">
+                        <aura:iteration items="{!v.warningMessages}" var="mess">
+                            {!mess}
+                            <br/>
+                        </aura:iteration>
+                    </p>
+                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-positive">
+                        <aura:iteration items="{!v.autoCorrectMessages}" var="mess">
+                            {!mess}
+                            <br/>
+                        </aura:iteration>
+                    </p>
+                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-negative">
+                        <aura:iteration items="{!v.errorMessages}" var="mess">
+                            {!mess}
+                            <br/>
+                        </aura:iteration>
+                    </p>
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input disabled="true" type="number" label="Celkové pojistné" name="TotalInsuranceAmount" formatter="currency"
+                                value="{!v.NNCalculation.Total_Premium__c}" />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input label="Varianta" disabled="true" name="Variant" value="{!v.NNCalculation.Insurance_Variant__c}" />
+                        </div>
+                    </div>
+
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input value="{!v.NNCalculation.Group_Discount_Percent__c}" max="100" min="0" type="number" label="Skupinová sleva (%)"
+                                name="GroupDiscount" onchange="{!c.showOrHideRecalculate}" />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input value="{!v.NNCalculation.Employer_Contribution__c}" type="number" label="Příspěvek zaměstnavatele (€)" name="EmploymentContribution"
+                                formatter="currency" onchange="{!c.showOrHideRecalculate}" step="0.01" />
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input type="number" disabled="true" label="Frekvenční sleva" name="FrequentDiscount" formatter="currency" value="{!v.NNCalculation.Frequency_Discount__c}"
+                            />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input type="number" disabled="true" label="Sleva na riziko" name="DiscountForRisk" formatter="currency" value="{!v.NNCalculation.Risk_Discount__c}"
+                            />
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input type="number" disabled="true" label="Skupinová sleva" value="{!v.NNCalculation.Group_Discount__c}" name="GroupDiscount"
+                                formatter="currency" />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input type="number" disabled="true" label="Pojistné celkem" name="TotalInsurance" formatter="currency" value="{!v.NNCalculation.Total_Premium__c}"
+                            />
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col">
+                            <lightning:input type="number" label="Příspěvek zaměstnavatele" name="ContributionOfEmployment" formatter="currency" disabled="true"
+                                value="{!v.NNCalculation.Calculated_Employer_Payment__c}" />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input type="number" label="Pojistné placené klientem" name="InsurancePayByClient" formatter="currency" disabled="true"
+                                value="{!v.NNCalculation.Calculated_Client_Payment__c}" />
+                        </div>
+                    </div>
+                </aura:set>
+            </lightning:card>
+        </div>
+    </div>
+</aura:component>

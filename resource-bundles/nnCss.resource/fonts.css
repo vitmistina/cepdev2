@@ -1,0 +1,12 @@
+@font-face {
+  font-family: "NNDagnyTextWeb";
+  src: url("NNDagnyTextWeb.eot");
+  src: url("NNDagnyTextWeb.eot?#iefix") format("embedded-opentype"),
+    url("NNDagnyTextWeb.woff") format("woff");
+}
+@font-face {
+  font-family: "NNDagnyDisplayWebPro";
+  src: url("NNDagnyDisplayWebPro.eot");
+  src: url("NNDagnyDisplayWebPro.eot?#iefix") format("embedded-opentype"),
+    url("NNDagnyDisplayWebPro.woff") format("woff");
+}

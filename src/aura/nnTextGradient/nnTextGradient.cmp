@@ -1,0 +1,9 @@
+<aura:component>
+  <aura:attribute name="text" type="String" required="true" />
+  <aura:attribute name="gradientWords" type="List" />
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <aura:handler name="change" value="{!v.text}" action="{!c.doInit}" />
+  <aura:iteration items="{! v.gradientWords }" var="word">
+    <span class="{! word.class }">{! word.string }</span>
+  </aura:iteration>
+</aura:component>

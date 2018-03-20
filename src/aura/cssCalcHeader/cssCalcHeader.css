@@ -1,0 +1,69 @@
+.THIS {
+  position: sticky;
+  top: 0;
+  padding-bottom: 4px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #ffffff;
+  z-index: 1;
+}
+
+.THIS h1.logo img {
+  position: relative;
+  left: -12px;
+  width: 75px;
+}
+
+.THIS h2 {
+  text-align: center;
+  align-self: center;
+  font-size: 24px;
+}
+
+.THIS nav {
+  grid-column: -1/1;
+  display: flex;
+}
+
+.THIS .pull-left {
+  flex: 1;
+}
+
+.THIS > nav > ul {
+  display: flex;
+}
+
+.THIS > nav > ul > li:not(:first-child) {
+  margin-left: 10px;
+}
+
+.THIS button {
+  height: 40px;
+  min-width: 40px;
+  border: 1px solid var(--orange-medium);
+  color: var(--orange-medium);
+  font-family: var(--dagny-display);
+  background-color: #ffffff;
+}
+
+.THIS button > img {
+  height: 24px;
+}
+
+.THIS button:focus {
+  outline: none;
+}
+
+.THIS button.done {
+  color: #ffffff;
+  background-color: var(--orange-medium);
+}
+
+.THIS button.disabled {
+  color: var(--grey-light);
+  border-color: var(--grey-light);
+}
+
+.THIS button.disabled img {
+  filter: grayscale(1) opacity(0.35);
+}

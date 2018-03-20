@@ -1,0 +1,53 @@
+<aura:component>
+  <aura:attribute name="open" type="boolean" default="false" access="private" />
+  <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
+  <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
+
+  <aura:attribute name="productOptions" type="List" default="[{label:'Smart'},{label:'Protect'}]" access="public" />
+  <li class="{! (v.open ? 'open':'') + ' menu-item-with-overview'}">
+    <button type="button" class="overview-button" onclick="{!c.toggleOpen}">
+      <aura:if isTrue="{!v.recalculateRequired}">
+        - €
+        <aura:set attribute="else">
+          <ui:outputCurrency value="{!v.NNCalculation.Total_Premium__c}" currencyCode="EUR" currencySymbol="€" format=".00 €" />
+        </aura:set>
+      </aura:if>
+      <img src="{!$Resource.nnCss + '/img/ic-arrow-down@2x.png'}" alt="" />
+    </button>
+    <div class="overview-container">
+      <div class="overview-header">
+        <span>Prehľad poistenia</span>
+        <button class="close">
+          <img src="{!$Resource.nnCss + '/img/ic-close@2x.png'}" alt="x" onclick="{!c.toggleOpen}" />
+        </button>
+      </div>
+      <div class="overview-main-area-left">
+        <!-- komponenta produktovych uprav -->
+        <div class="input-with-helptext">
+          <lightning:select label="Produkt" name="Product" value="{!v.NNCalculation.Product__c}" onchange="{!c.showOrHideRecalculate}">
+            <aura:iteration items="{!v.productOptions}" var="option">
+              <option value="{!option.value}">{!option.label}</option>
+            </aura:iteration>
+          </lightning:select>
+          <lightning:helptext content="Your email address will be your login name" />
+        </div>
+        <!-- komponenta tabulky nastaveni pojisteni -->
+        <div class="product-overview">
+          <!-- nepsat přes iteration, bude to 7 outputů -->
+          <aura:iteration items="[{'id': 'Main_Insurance__c', 'name':'Hlavné krytie', 'value': 16.2, 'isSummaryRow':false},{'id': 'Total_Insurance__c', 'name':'Poistné platené klientom', 'value': 2.2, 'isSummaryRow':true} ]"
+            var="row">
+            <span class="{! row.isSummaryRow ? 'subtotal'  : '' }">{! row.name }</span>
+            <!-- is it possible to access object path from value provider as defined by another variable? -->
+            <ui:outputCurrency value="{! row.value}" currencyCode="EUR" currencySymbol="€" format=".00 €" class="{! row.isSummaryRow ? 'subtotal sum' : 'sum' }"
+            />
+          </aura:iteration>
+        </div>
+      </div>
+      <div class="overview-main-area-right">
+        <aura:iteration items="[{id:'error',items:['a','b']},{id:'warning',items:['a','b']},{id:'info',items:['a','b']}]" var="messageGroup">
+          <c:cssCalcMessages messageGroup="{! messageGroup }" />
+        </aura:iteration>
+      </div>
+    </div>
+  </li>
+</aura:component>

@@ -1,0 +1,47 @@
+<aura:component>
+  <!-- own state variables -->
+  <!-- passed variables from parents -->
+  <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
+  <aura:attribute name="productOptions" type="List" access="public" default="Red,Green,Blue" />
+  <aura:attribute name="selectedProduct" type="String" access="public" default="NN" />
+  <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
+
+  <!-- <aura:attribute name="navigationModel" type="List" access="private" />
+  <aura:attribute name="actionsModel" type="List" access="private" /> -->
+  <!-- start of HTML markup -->
+  <div class="header">
+    <h1 class="logo">
+      <img src="{!$Resource.nnCss + '/img/NN-logo@2x.png'}" alt="NN" />
+    </h1>
+    <h2>
+      <c:nnTextGradient text="{!v.selectedProduct}" />
+    </h2>
+
+    <nav>
+      <ul class="pull-left">
+        <aura:iteration items="[{ label: '1. poistený', state: 'done'}, {label: '2. poistený', state: 'active'}, {label: 'Deti', state: 'disabled'}, {label: 'Investície', state: 'disabled'}]"
+          var="navigationItem">
+          <li>
+            <button type="button" class="{! navigationItem.state }" disabled="{! navigationItem.state == 'disabled' }">
+              {! navigationItem.label }
+            </button>
+          </li>
+        </aura:iteration>
+      </ul>
+      <ul class="pull-right">
+        <li>
+          <button type="button" class="disabled" disabled="true">
+            <img src="{!$Resource.nnCss + '/img/ic-pdf@2x.png'}" alt="" />
+          </button>
+        </li>
+        <li>
+          <button type="button" class="{! not(v.recalculateRequired) ? 'disabled' : ''}" disabled="{! not(v.recalculateRequired)}"
+            onclick="{!c.recalculate}">
+            <img src="{!$Resource.nnCss + '/img/ic-calculator@2x.png'}" alt="" />
+          </button>
+        </li>
+        <c:cssCalcOverview NNCalculation="{!v.NNCalculation}" recalculateRequired="{!v.recalculateRequired}" />
+      </ul>
+    </nav>
+  </div>
+</aura:component>

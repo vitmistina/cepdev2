@@ -1,0 +1,114 @@
+.THIS {
+  position: relative;
+}
+
+.THIS .overview-button {
+  background-color: var(--orange-medium);
+  color: #ffffff;
+}
+
+.THIS.open .overview-button {
+  height: 48px;
+  border-bottom: 8px solid var(--orange-medium);
+  margin-bottom: -8px;
+}
+
+.THIS .overview-button > img {
+  height: 6px;
+}
+
+.THIS.open .overview-button > img {
+  transform: rotate(0.5turn);
+}
+
+.THIS .overview-container {
+  display: none;
+}
+
+.THIS.open .overview-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 10px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 7px);
+  width: 740px;
+  border: 1px solid var(--orange-medium);
+  border-radius: 4px 0px 4px 4px;
+  background-color: #ffffff;
+}
+
+.THIS .overview-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  background-color: var(--orange-medium);
+  color: #ffffff;
+}
+
+.THIS .overview-header span {
+  flex: 1;
+  padding-left: 10px;
+  font-family: var(--dagny-display);
+}
+
+.THIS .overview-header .close {
+  background-color: transparent;
+  height: 32px;
+  min-width: 0;
+}
+
+.THIS .overview-header .close > img {
+  height: 14px;
+}
+
+.THIS .overview-main-area-left {
+  padding: 10px 0 10px 10px;
+}
+
+.THIS .overview-main-area-right {
+  padding: 10px 10px 10px 0;
+}
+
+.THIS .product-overview {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+}
+
+.THIS .sum {
+  justify-self: flex-end;
+  font-family: var(--dagny-display);
+}
+
+.THIS .subtotal {
+  font-family: var(--dagny-display);
+  color: var(--orange-medium);
+}
+
+.THIS lightning-helptext button.slds-button {
+  height: auto;
+  min-width: auto;
+  border: 0;
+}
+
+.THIS .input-with-helptext {
+  display: flex;
+  align-items: flex-end;
+}
+
+.THIS .input-with-helptext div.slds-form-element {
+  flex: 1;
+}
+
+.THIS .input-with-helptext lightning-helptext {
+  margin-left: 6px;
+  margin-bottom: 6px;
+}
+
+.THIS .overview-main-area-left > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.THIS .overview-main-area-right > *:not(:last-child) {
+  margin-bottom: 16px;
+}
