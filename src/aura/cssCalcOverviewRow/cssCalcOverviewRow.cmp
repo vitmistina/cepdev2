@@ -1,0 +1,15 @@
+<aura:component>
+  <!-- passed attributes -->
+  <aura:attribute name="name" type="String" required="true" />
+  <aura:attribute name="value" type="Decimal" required="true" />
+  <aura:attribute name="subtotal" type="Boolean" default="false" />
+  <!-- XML markup -->
+  <span class="{! v.subtotal ? 'subtotal' : ''}">{! v.name }</span>
+  <aura:if isTrue="{! not(v.value == 0 || v.value == null)}">
+    <ui:outputCurrency value="{!v.value}" currencyCode="EUR" currencySymbol="€" format=".00 €" class="{!join(' ','sum', (v.subtotal ? 'subtotal' : ''))}"
+    />
+    <aura:set attribute="else">
+      <span class="{!join(' ','sum', (v.subtotal ? 'subtotal' : ''))}">– €</span>
+    </aura:set>
+  </aura:if>
+</aura:component>

@@ -1,0 +1,11 @@
+<aura:component>
+    <aura:attribute name="title" type="String" access="public" />
+    <aura:attribute name="class" type="String" access="public" />
+    <aura:attribute name="stepId" type="Integer" access="public" />
+    <aura:attribute name="currentStep" type="Integer" access="public" />
+    <aura:attribute name="calculationObjectId" type="String" access="public" />
+
+    <div class="{!v.class}">
+        {!v.body}
+    </div>
+</aura:component>

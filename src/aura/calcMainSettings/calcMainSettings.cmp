@@ -1,0 +1,12 @@
+<aura:component>
+  <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
+  <aura:attribute name="productOptions" type="List" access="public" default="Red,Green,Blue" />
+  <aura:attribute name="selectedProductCode" type="String" access="public" />
+  <div>
+    <lightning:select label="Produkt" name="Product" aura:id="Product" value="{!v.selectedProductCode}" onchange="{!c.handleProductChange}">
+      <aura:iteration items="{!v.productOptions}" var="option">
+        <option value="{!option.value}">{!option.label}</option>
+      </aura:iteration>
+    </lightning:select>
+  </div>
+</aura:component>

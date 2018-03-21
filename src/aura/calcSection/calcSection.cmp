@@ -1,0 +1,12 @@
+<aura:component>
+  <aura:attribute name="headline" type="String" />
+  <aura:attribute name="open" type="Boolean" default="true" />
+  <div class="{! v.open ? 'open' : ''}">
+    <div class="header" onclick="{!c.toggleOpen}">
+      <h3>{!v.headline}</h3>
+    </div>
+    <div class="content">
+      {!v.body}
+    </div>
+  </div>
+</aura:component>

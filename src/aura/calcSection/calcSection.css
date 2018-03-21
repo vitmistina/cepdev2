@@ -1,0 +1,49 @@
+.THIS {
+  background: var(--grey-ultra-light);
+  border-radius: 4px;
+}
+
+.THIS .header {
+  position: relative;
+  padding-left: 24px;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+  background: var(--grey-extra-light);
+  color: var(--orange-medium);
+}
+
+.THIS .header h3::before {
+  position: absolute;
+  content: "";
+  display: block;
+  left: 6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  bottom: calc(0.875rem - 6px);
+  border-top: 6px solid var(--orange-medium);
+}
+
+.THIS.open .header h3::before {
+  transform: rotate(0.5turn);
+}
+
+.THIS .content {
+  display: none;
+  padding: 12px;
+}
+
+.THIS.open .content {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 12px;
+}
+
+.THIS.open .content > *.half {
+  grid-column: span 3;
+}
+
+.THIS.open .content > *.third {
+  grid-column: span 2;
+}

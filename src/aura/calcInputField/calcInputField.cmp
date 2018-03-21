@@ -1,0 +1,34 @@
+<aura:component>
+  <aura:attribute name="type" type="String" required="true" />
+  <aura:attribute name="label" type="String" required="true" />
+  <aura:attribute name="name" type="String" required="true" />
+  <aura:attribute name="value" type="String" required="true" />
+  <aura:attribute name="required" type="Boolean" default="false" />
+  <aura:attribute name="min" type="String" />
+  <aura:attribute name="options" type="String[]" />
+  <aura:attribute name="helptext" type="String" />
+  <aura:attribute name="class" type="String" />
+
+
+  <!-- component events registration -->
+  <aura:registerEvent name="calcProductChangeEvent" type="c:calcProductChange" />
+
+  <!-- XML markup -->
+  <div class="{!join(' ','input-with-helptext',v.class)}">
+    <aura:if isTrue="{!v.type=='select'}">
+      <c:calcSelectField name="{!v.name}" label="{!v.label}" value="{!v.value}" options="{!v.options}" />
+    </aura:if>
+    <aura:if isTrue="{!v.type=='currency'}">
+      <lightning:input type="number" name="{!v.name}" label="{!v.label}" value="{!v.value}" min="{!v.min}" formatter="currency"
+        onchange="{!c.fireChangeEvent}" required="{!v.required}" />
+    </aura:if>
+    <aura:if isTrue="{!v.type=='text'}">
+      <lightning:input type="text" name="{!v.name}" label="{!v.label}" value="{!v.value}" onchange="{!c.fireChangeEvent}" required="{!v.required}"
+      />
+
+    </aura:if>
+    <aura:if isTrue="{!not(empty(v.helptext))}">
+      <lightning:helptext content="{!v.helptext}" />
+    </aura:if>
+  </div>
+</aura:component>

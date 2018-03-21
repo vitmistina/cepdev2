@@ -75,8 +75,15 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
+    <!-- event handling -->
     <aura:handler name="getNetIncome" event="c:CalculationGetNetIncomeEvent" action="{!c.handleGetNetIncome}" />
+    <aura:handler name="calcRecalculateEvent" event="c:calcRecalculate" action="{!c.recalculate}" />
+    <aura:handler name="calcProductChangeEvent" event="c:calcProductChange" action="{!c.handleProductChange}" />
+
+    <!-- register events -->
     <aura:registerEvent name="validateFields" type="c:CalculationValidateFormPersonEvent" />
+
+    <!-- spinner -->
     <aura:if isTrue="{!v.Spinner}">
         <div aura:id="spinnerId" class="slds-spinner_container">
             <div role="status" class="slds-spinner slds-spinner_medium">
@@ -87,14 +94,45 @@
         </div>
     </aura:if>
 
+    <!-- main component -->
     <div class="slds-grid">
-        <c:cssCalcHeader NNCalculation="{!v.NNCalculation}" selectedProduct="{!v.selectedProduct}" recalculateRequired="{!v.recalculateRequired}"
+        <c:cssCalcHeader NNCalculation="{!v.NNCalculation}" selectedProduct="{!v.selectedProduct}" selectedProductCode="{!v.NNCalculation.Product__c}"
+            recalculateRequired="{!v.recalculateRequired}" productOptions="{!v.productOptions}" infoMessages="{!v.infoMessages}"
+            warningMessages="{!v.warningMessages}" autoCorrectMessages="{!v.autoCorrectMessages}" errorMessages="{!v.errorMessages}"
+            paymentFrequency="{!v.NNCalculation.PaymentFrequency__c}" paymentFrequencyOptions="{!v.paymentFrequencyOptions}"
+            insuranceVariant="{!v.NNCalculation.Insurance_Variant__c}" insuranceVariantOptions="{!v.insuranceVariants}" employmentContribution="{!v.NNCalculation.Employer_Contribution__c}"
         />
+
+        <c:CalculationStep title="" aura:id="step1" class="slds-form" stepId="1" currentStep="{!v.currentStep}">
+            <c:calcSection headline="Základné informace">
+                <c:csBasicInfo calculationName="{!v.NNCalculation.CalculationName__c}" />
+                <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.NNCalculation.CalculationName__c}"
+                    required="true" aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" class="third"
+                />
+                <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}"
+                    class="third" />
+                <c:calcInputField type="select" name="PaymentFrequency" label="Frekvence plateb" value="{!v.NNCalculation.PaymentFrequency__c}"
+                    options="{!v.paymentFrequencyOptions}" class="third" />
+
+                <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
+                    onchange="{!c.showOrHideRecalculate}" class="third" />
+                <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
+                    onchange="{!c.showOrHideRecalculate}" class="third" />
+                <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.NNCalculation.Insurance_Variant__c}"
+                    options="{!v.insuranceVariants}" helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
+                    class="third" />
+
+                <lightning:input type="toggle" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
+                    messageToggleActive="Anonymní" messageToggleInactive="S vytvořením klienta" class="third" />
+                <lightning:input type="toggle" label="Pojistit druhou osobu" name="insureSecondPerson" aura:id="isSecond" checked="{!v.NNCalculation.Has_Second_Insured__c}"
+                    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+                <lightning:input type="toggle" label="Pojistit dítě" name="anonymousCalculation" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
+                    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+            </c:calcSection>
+        </c:CalculationStep>
+
+
         <div class="slds-size_1-of-1 slds-medium-size_2-of-3 slds-large-size_2-of-3 slds-p-horizontal_small">
-            <h1 style="margin-top:20px">
-                <span class="nnLightOrange">Kalkulace </span>
-                <span class="nnMediumOrange">pojištění</span>
-            </h1>
             <lightning:input type="checkbox" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
             />
             <div class="calculationMain">
@@ -106,11 +144,7 @@
                             <option value="{!option.value}">{!option.label}</option>
                         </aura:iteration>
                     </lightning:select>
-                    <lightning:select label="Produkt" name="Product" value="{!v.NNCalculation.Product__c}" onchange="{!c.handleProductChange}">
-                        <aura:iteration items="{!v.productOptions}" var="option">
-                            <option value="{!option.value}">{!option.label}</option>
-                        </aura:iteration>
-                    </lightning:select>
+                    <c:calcSelectField name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}" />
                     <div class="slds-grid">
                         <div class="slds-col">
                             <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
@@ -323,101 +357,6 @@
                 </div>
             </div>
         </div>
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-large-size_1-of-3 slds-p-horizontal_small">
-            <lightning:card class="shoppingCartCard">
-                <aura:set attribute="title">
-                    Pojistné:
-                    <ui:outputCurrency value="{!v.NNCalculation.Total_Premium__c}" currencyCode="EUR" currencySymbol="€" format=".00 €" />
-                </aura:set>
-                <!--</lightning:card>-->
-                <!--<lightning:card >-->
-                <aura:set attribute="footer">
-                    <aura:if isTrue="{!v.recalculateRequired}">
-                        <lightning:button aura:id="recalculateButton" variant="brand" label="Přepočítat" onclick="{!c.recalculate}" />
-                    </aura:if>
-                    <aura:if isTrue="{!v.currentStep == 9}">
-                        <lightning:button label="Vytvořit smlouvu " />
-                    </aura:if>
-                    <aura:if isTrue="{!v.currentStep == 9}">
-                        <lightning:button label="Zobrazit PDF " onclick="{!c.openPDF}" />
-                    </aura:if>
-                    <lightning:button label="Otevřít košík 🛒" />
-                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-positive">
-                        <aura:iteration items="{!v.infoMessages}" var="mess">
-                            {!mess}
-                            <br/>
-                        </aura:iteration>
-                    </p>
-                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-negative">
-                        <aura:iteration items="{!v.warningMessages}" var="mess">
-                            {!mess}
-                            <br/>
-                        </aura:iteration>
-                    </p>
-                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-positive">
-                        <aura:iteration items="{!v.autoCorrectMessages}" var="mess">
-                            {!mess}
-                            <br/>
-                        </aura:iteration>
-                    </p>
-                    <p class="slds-p-horizontal_medium slds-p-vertical_xx-small message-negative">
-                        <aura:iteration items="{!v.errorMessages}" var="mess">
-                            {!mess}
-                            <br/>
-                        </aura:iteration>
-                    </p>
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input disabled="true" type="number" label="Celkové pojistné" name="TotalInsuranceAmount" formatter="currency"
-                                value="{!v.NNCalculation.Total_Premium__c}" />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input label="Varianta" disabled="true" name="Variant" value="{!v.NNCalculation.Insurance_Variant__c}" />
-                        </div>
-                    </div>
 
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input value="{!v.NNCalculation.Group_Discount_Percent__c}" max="100" min="0" type="number" label="Skupinová sleva (%)"
-                                name="GroupDiscount" onchange="{!c.showOrHideRecalculate}" />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input value="{!v.NNCalculation.Employer_Contribution__c}" type="number" label="Příspěvek zaměstnavatele (€)" name="EmploymentContribution"
-                                formatter="currency" onchange="{!c.showOrHideRecalculate}" step="0.01" />
-                        </div>
-                    </div>
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input type="number" disabled="true" label="Frekvenční sleva" name="FrequentDiscount" formatter="currency" value="{!v.NNCalculation.Frequency_Discount__c}"
-                            />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input type="number" disabled="true" label="Sleva na riziko" name="DiscountForRisk" formatter="currency" value="{!v.NNCalculation.Risk_Discount__c}"
-                            />
-                        </div>
-                    </div>
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input type="number" disabled="true" label="Skupinová sleva" value="{!v.NNCalculation.Group_Discount__c}" name="GroupDiscount"
-                                formatter="currency" />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input type="number" disabled="true" label="Pojistné celkem" name="TotalInsurance" formatter="currency" value="{!v.NNCalculation.Total_Premium__c}"
-                            />
-                        </div>
-                    </div>
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input type="number" label="Příspěvek zaměstnavatele" name="ContributionOfEmployment" formatter="currency" disabled="true"
-                                value="{!v.NNCalculation.Calculated_Employer_Payment__c}" />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input type="number" label="Pojistné placené klientem" name="InsurancePayByClient" formatter="currency" disabled="true"
-                                value="{!v.NNCalculation.Calculated_Client_Payment__c}" />
-                        </div>
-                    </div>
-                </aura:set>
-            </lightning:card>
-        </div>
     </div>
 </aura:component>

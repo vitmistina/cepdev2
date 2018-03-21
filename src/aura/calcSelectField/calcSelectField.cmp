@@ -1,0 +1,17 @@
+<aura:component>
+  <aura:attribute name="label" type="String" required="true" />
+  <aura:attribute name="name" type="String" required="true" />
+  <aura:attribute name="value" type="String" required="true" />
+  <aura:attribute name="options" type="String[]" required="true" />
+  <aura:attribute name="helptext" type="String" />
+
+  <!-- component events registration -->
+  <aura:registerEvent name="calcProductChangeEvent" type="c:calcProductChange" />
+
+  <!-- XML markup -->
+  <lightning:select label="{!v.label}" name="{!v.name}" value="{!v.value}" onchange="{!c.fireChangeEvent}">
+    <aura:iteration items="{!v.options}" var="option">
+      <option value="{!option.value}" selected="{!empty(option.selected)?false:option.selected}">{!option.label}</option>
+    </aura:iteration>
+  </lightning:select>
+</aura:component>

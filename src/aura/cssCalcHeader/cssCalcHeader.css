@@ -3,7 +3,7 @@
   top: 0;
   padding-bottom: 4px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 3fr 1fr;
   background: #ffffff;
   z-index: 1;
 }
@@ -23,6 +23,7 @@
 .THIS nav {
   grid-column: -1/1;
   display: flex;
+  justify-content: flex-end;
 }
 
 .THIS .pull-left {

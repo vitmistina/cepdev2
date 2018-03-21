@@ -1,6 +1,7 @@
 :root {
   --orange-light: #ee7f00;
   --orange-medium: #ea650d;
+  --orange-medium-darker: #cf5a0c;
   --orange-dark: #e64415;
 
   --red: #d0021b;
@@ -15,4 +16,68 @@
 
   --dagny-display: "NNDagnyDisplayWebPro";
   --dagny-text: "NNDagnyTextWeb";
+}
+
+@keyframes warning-flash {
+  from {
+    color: #ffffff;
+  }
+  50% {
+    color: transparent;
+  }
+  to {
+    color: #ffffff;
+  }
+}
+
+/* overrides */
+.slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox_faux:hover,
+.slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox_faux:focus,
+.slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox--faux:hover,
+.slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox--faux:focus,
+.slds-checkbox_toggle [type="checkbox"]:checked ~ .slds-checkbox_faux:hover,
+.slds-checkbox_toggle [type="checkbox"]:checked ~ .slds-checkbox_faux:focus,
+.slds-checkbox_toggle [type="checkbox"]:checked ~ .slds-checkbox--faux:hover,
+.slds-checkbox_toggle [type="checkbox"]:checked ~ .slds-checkbox--faux:focus,
+.slds-checkbox_toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox_faux_container
+  .slds-checkbox_faux:hover,
+.slds-checkbox_toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox_faux_container
+  .slds-checkbox_faux:focus,
+.slds-checkbox_toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox--faux_container
+  .slds-checkbox--faux:hover,
+.slds-checkbox_toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox--faux_container
+  .slds-checkbox--faux:focus,
+.slds-checkbox--toggle [type="checkbox"]:checked + .slds-checkbox_faux:hover,
+.slds-checkbox--toggle [type="checkbox"]:checked + .slds-checkbox_faux:focus,
+.slds-checkbox--toggle [type="checkbox"]:checked + .slds-checkbox--faux:hover,
+.slds-checkbox--toggle [type="checkbox"]:checked + .slds-checkbox--faux:focus,
+.slds-checkbox--toggle [type="checkbox"]:checked ~ .slds-checkbox_faux:hover,
+.slds-checkbox--toggle [type="checkbox"]:checked ~ .slds-checkbox_faux:focus,
+.slds-checkbox--toggle [type="checkbox"]:checked ~ .slds-checkbox--faux:hover,
+.slds-checkbox--toggle [type="checkbox"]:checked ~ .slds-checkbox--faux:focus,
+.slds-checkbox--toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox_faux_container
+  .slds-checkbox_faux:hover,
+.slds-checkbox--toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox_faux_container
+  .slds-checkbox_faux:focus,
+.slds-checkbox--toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox--faux_container
+  .slds-checkbox--faux:hover,
+.slds-checkbox--toggle
+  [type="checkbox"]:checked
+  + .slds-checkbox--faux_container
+  .slds-checkbox--faux:focus {
+  background-color: var(--orange-medium);
 }

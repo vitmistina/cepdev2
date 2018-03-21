@@ -1,0 +1,25 @@
+<aura:component>
+  <aura:attribute name="calculationName" type="String" />
+
+  <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.calculationName}" required="true"
+    aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" class="third" />
+  <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}"
+    class="third" />
+  <c:calcInputField type="select" name="PaymentFrequency" label="Frekvence plateb" value="{!v.NNCalculation.PaymentFrequency__c}"
+    options="{!v.paymentFrequencyOptions}" class="third" />
+
+  <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
+    onchange="{!c.showOrHideRecalculate}" class="third" />
+  <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
+    onchange="{!c.showOrHideRecalculate}" class="third" />
+  <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.NNCalculation.Insurance_Variant__c}"
+    options="{!v.insuranceVariants}" helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
+    class="third" />
+
+  <lightning:input type="toggle" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
+    messageToggleActive="Anonymní" messageToggleInactive="S vytvořením klienta" class="third" />
+  <lightning:input type="toggle" label="Pojistit druhou osobu" name="insureSecondPerson" aura:id="isSecond" checked="{!v.NNCalculation.Has_Second_Insured__c}"
+    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+  <lightning:input type="toggle" label="Pojistit dítě" name="anonymousCalculation" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
+    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+</aura:component>

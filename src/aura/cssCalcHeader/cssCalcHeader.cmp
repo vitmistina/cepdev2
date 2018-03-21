@@ -1,10 +1,22 @@
 <aura:component>
-  <!-- own state variables -->
   <!-- passed variables from parents -->
   <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
-  <aura:attribute name="productOptions" type="List" access="public" default="Red,Green,Blue" />
   <aura:attribute name="selectedProduct" type="String" access="public" default="NN" />
+  <aura:attribute name="selectedProductCode" type="String" access="public" />
+  <aura:attribute name="productOptions" type="List" access="public" />
+  <aura:attribute name="paymentFrequency" type="String" access="public" />
+  <aura:attribute name="paymentFrequencyOptions" type="List" access="public" />
+  <aura:attribute name="insuranceVariant" type="String" access="public" />
+  <aura:attribute name="insuranceVariantOptions" type="List" access="public" />
+  <aura:attribute name="employmentContribution" type="Decimal" access="public" />
   <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
+  <aura:attribute name="errorMessages" access="public" type="String[]" />
+  <aura:attribute name="infoMessages" access="public" type="String[]" />
+  <aura:attribute name="warningMessages" access="public" type="String[]" />
+  <aura:attribute name="autoCorrectMessages" access="public" type="String[]" />
+
+  <!-- events registration -->
+  <aura:registerEvent name="calcRecalculateEvent" type="c:calcRecalculate" />
 
   <!-- <aura:attribute name="navigationModel" type="List" access="private" />
   <aura:attribute name="actionsModel" type="List" access="private" /> -->
@@ -18,7 +30,7 @@
     </h2>
 
     <nav>
-      <ul class="pull-left">
+      <!-- <ul class="pull-left">
         <aura:iteration items="[{ label: '1. poistený', state: 'done'}, {label: '2. poistený', state: 'active'}, {label: 'Deti', state: 'disabled'}, {label: 'Investície', state: 'disabled'}]"
           var="navigationItem">
           <li>
@@ -27,7 +39,7 @@
             </button>
           </li>
         </aura:iteration>
-      </ul>
+      </ul> -->
       <ul class="pull-right">
         <li>
           <button type="button" class="disabled" disabled="true">
@@ -36,11 +48,15 @@
         </li>
         <li>
           <button type="button" class="{! not(v.recalculateRequired) ? 'disabled' : ''}" disabled="{! not(v.recalculateRequired)}"
-            onclick="{!c.recalculate}">
+            onclick="{!c.fireRecalculateEvent}">
             <img src="{!$Resource.nnCss + '/img/ic-calculator@2x.png'}" alt="" />
           </button>
         </li>
-        <c:cssCalcOverview NNCalculation="{!v.NNCalculation}" recalculateRequired="{!v.recalculateRequired}" />
+        <c:cssCalcOverview NNCalculation="{!v.NNCalculation}" selectedProductCode="{!v.selectedProductCode}" productOptions="{!v.productOptions}"
+          paymentFrequency="{!v.paymentFrequency}" paymentFrequencyOptions="{!v.paymentFrequencyOptions}" recalculateRequired="{!v.recalculateRequired}"
+          infoMessages="{!v.infoMessages}" warningMessages="{!v.warningMessages}" autoCorrectMessages="{!v.autoCorrectMessages}"
+          errorMessages="{!v.errorMessages}" insuranceVariant="{!v.insuranceVariant}" insuranceVariantOptions="{!v.insuranceVariantOptions}"
+          employmentContribution="{!v.employmentContribution}" />
       </ul>
     </nav>
   </div>

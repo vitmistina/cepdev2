@@ -39,11 +39,13 @@
 
 /* inputs and labels */
 
+/* label */
 .THIS .slds-form-element__label {
   color: var(--grey-medium);
   font-size: 15px;
 }
 
+/* select */
 .THIS .slds-select {
   border-color: var(--grey-extra-light);
 }
@@ -58,4 +60,14 @@
   border-top: 6px solid var(--orange-medium);
   bottom: calc(50% - 4px);
   right: 12px;
+}
+
+/* input text (+currency, percent, number) */
+.THIS .slds-input {
+  border-color: var(--grey-extra-light);
+}
+
+/* toggle */
+.THIS .slds-checkbox--toggle.slds-grid {
+  flex-direction: column;
 }

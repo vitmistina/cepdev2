@@ -1,52 +1,78 @@
 <aura:component>
+  <!-- own state variables -->
   <aura:attribute name="open" type="boolean" default="false" access="private" />
-  <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
-  <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
 
-  <aura:attribute name="productOptions" type="List" default="[{label:'Smart'},{label:'Protect'}]" access="public" />
-  <li class="{! (v.open ? 'open':'') + ' menu-item-with-overview'}">
+  <!-- passed variables from parents -->
+  <aura:attribute name="recalculateRequired" type="Boolean" access="global" default="false" />
+  <aura:attribute name="NNCalculation" type="NN_Calculation__c" access="public" />
+  <aura:attribute name="selectedProductCode" type="String" access="public" />
+  <aura:attribute name="productOptions" type="List" access="public" />
+  <aura:attribute name="paymentFrequency" type="String" access="public" />
+  <aura:attribute name="paymentFrequencyOptions" type="List" access="public" />
+  <aura:attribute name="insuranceVariant" type="String" access="public" />
+  <aura:attribute name="insuranceVariantOptions" type="List" access="public" />
+  <aura:attribute name="employmentContribution" type="Decimal" access="public" />
+  <aura:attribute name="errorMessages" access="public" type="String[]" />
+  <aura:attribute name="infoMessages" access="public" type="String[]" />
+  <aura:attribute name="warningMessages" access="public" type="String[]" />
+  <aura:attribute name="autoCorrectMessages" access="public" type="String[]" />
+
+  <!-- component events registration -->
+  <aura:registerEvent name="calcProductChangeEvent" type="c:calcProductChange" />
+
+  <!-- XML markup -->
+  <li class="{!join(' ','menu-item-with-overview',(v.open ? 'open':''),(not(empty(v.warningMessages)) ? 'warning' : ''),(not(empty(v.errorMessages)) ? 'error': ''))}">
+
     <button type="button" class="overview-button" onclick="{!c.toggleOpen}">
       <aura:if isTrue="{!v.recalculateRequired}">
-        - €
+        <span>- €</span>
         <aura:set attribute="else">
           <ui:outputCurrency value="{!v.NNCalculation.Total_Premium__c}" currencyCode="EUR" currencySymbol="€" format=".00 €" />
         </aura:set>
       </aura:if>
       <img src="{!$Resource.nnCss + '/img/ic-arrow-down@2x.png'}" alt="" />
     </button>
+
     <div class="overview-container">
+
       <div class="overview-header">
         <span>Prehľad poistenia</span>
         <button class="close">
           <img src="{!$Resource.nnCss + '/img/ic-close@2x.png'}" alt="x" onclick="{!c.toggleOpen}" />
         </button>
       </div>
+
       <div class="overview-main-area-left">
-        <!-- komponenta produktovych uprav -->
-        <div class="input-with-helptext">
-          <lightning:select label="Produkt" name="Product" value="{!v.NNCalculation.Product__c}" onchange="{!c.showOrHideRecalculate}">
-            <aura:iteration items="{!v.productOptions}" var="option">
-              <option value="{!option.value}">{!option.label}</option>
-            </aura:iteration>
-          </lightning:select>
-          <lightning:helptext content="Your email address will be your login name" />
-        </div>
+
+        <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.selectedProductCode}" options="{!v.productOptions}"
+        />
+        <c:calcInputField type="select" name="paymentFrequency" label="Frekvence plateb" value="{!v.paymentFrequency}" options="{!v.paymentFrequencyOptions}"
+        />
+        <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.insuranceVariant}" options="{!v.insuranceVariantOptions}"
+          helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
+        />
+        <c:calcInputField type="currency" name="employmentContribution" label="Příspěvek zaměstnavatele" value="{!v.employmentContribution}"
+          min="0" />
+
         <!-- komponenta tabulky nastaveni pojisteni -->
         <div class="product-overview">
-          <!-- nepsat přes iteration, bude to 7 outputů -->
-          <aura:iteration items="[{'id': 'Main_Insurance__c', 'name':'Hlavné krytie', 'value': 16.2, 'isSummaryRow':false},{'id': 'Total_Insurance__c', 'name':'Poistné platené klientom', 'value': 2.2, 'isSummaryRow':true} ]"
-            var="row">
-            <span class="{! row.isSummaryRow ? 'subtotal'  : '' }">{! row.name }</span>
-            <!-- is it possible to access object path from value provider as defined by another variable? -->
-            <ui:outputCurrency value="{! row.value}" currencyCode="EUR" currencySymbol="€" format=".00 €" class="{! row.isSummaryRow ? 'subtotal sum' : 'sum' }"
-            />
-          </aura:iteration>
+          <c:cssCalcOverviewRow name="Hlavné krytie" value="9999" />
+          <c:cssCalcOverviewRow name="Pripoistenie" value="9999" />
+          <c:cssCalcOverviewRow name="2. poistený" value="9999" />
+          <c:cssCalcOverviewRow name="Zľava za frekvenciu" value="{!v.NNCalculation.Frequency_Discount__c}" />
+          <c:cssCalcOverviewRow name="Zľava za riziko" value="{!v.NNCalculation.Risk_Discount__c}" />
+          <c:cssCalcOverviewRow name="Skupinová zľava" value="{!v.NNCalculation.Group_Discount__c}" />
+          <c:cssCalcOverviewRow name="Celkové poistné" value="{!v.NNCalculation.Total_Premium__c}" subtotal="true" />
+          <c:cssCalcOverviewRow name="Príspevok zamestnávateľa" value="{!v.NNCalculation.Employer_Contribution__c}" />
+          <c:cssCalcOverviewRow name="Poistné platené klientom" value="{!v.NNCalculation.Calculated_Client_Payment__c}" subtotal="true"
+          />
         </div>
       </div>
       <div class="overview-main-area-right">
-        <aura:iteration items="[{id:'error',items:['a','b']},{id:'warning',items:['a','b']},{id:'info',items:['a','b']}]" var="messageGroup">
-          <c:cssCalcMessages messageGroup="{! messageGroup }" />
-        </aura:iteration>
+        <c:cssCalcMessages messageGroup="{! v.errorMessages }" messageType="error" messageGroupName="Chyby" />
+        <c:cssCalcMessages messageGroup="{! v.warningMessages }" messageType="warning" messageGroupName="Varovanie" />
+        <c:cssCalcMessages messageGroup="{! v.infoMessages }" messageType="info" messageGroupName="Informácie" />
+        <c:cssCalcMessages messageGroup="{! v.autoCorrectMessages }" messageType="auto-correct" messageGroupName="Autokorekcie" />
       </div>
     </div>
   </li>

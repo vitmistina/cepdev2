@@ -46,7 +46,7 @@
 .THIS.warning ul {
   color: #ffffff;
   background-color: var(--orange-medium);
-  border-color: var(--orange-dark);
+  border-color: var(--orange-medium-darker);
 }
 
 .THIS.error h3 {

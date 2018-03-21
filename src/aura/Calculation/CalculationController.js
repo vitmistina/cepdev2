@@ -246,15 +246,9 @@
         );
         cmp.set("v.NNCalculation.Insurance_Variant__c", parsed.variant);
         cmp.set("v.NNCalculation.CalculationName__c", "Moje nová kalkulace");
-        const selectedProductArray = cmp
-          .get("v.productOptions")
-          .filter(row => row.value == parsed.productCode);
-
         cmp.set(
           "v.selectedProduct",
-          selectedProductArray.length > 0
-            ? selectedProductArray[0].label.split("-").pop()
-            : ""
+          h.getSelectedProduct(cmp, parsed.productCode)
         );
       } else if (response.getState() == "ERROR") {
         h.handleError(cmp, response.getError());
@@ -336,18 +330,14 @@
     component.set("v.recalculateRequired", true);
   },
 
-  handleProductChange: function(component, event) {
+  handleProductChange: function(component, event, helper) {
     component.set("v.recalculateRequired", true);
-    const selectedProductArray = component
-      .get("v.productOptions")
-      .filter(row => row.value == event.getSource().get("v.value"));
-
-    component.set(
-      "v.selectedProduct",
-      selectedProductArray.length > 0
-        ? selectedProductArray[0].label.split("-").pop()
-        : ""
-    );
+    if (event.getParam("fieldName") === "Product") {
+      component.set(
+        "v.selectedProduct",
+        helper.getSelectedProduct(component, event.getSource().get("v.value"))
+      );
+    }
   },
 
   showOrHideRecalculateFunds: function(component) {
