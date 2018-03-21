@@ -15,13 +15,7 @@
       return;
     }
     if (s == 1) {
-      var inputCalcName = cmp.find("calculationName");
-      var allValid = inputCalcName.get("v.validity").valid;
-      console.log("valid " + allValid);
-      if (!allValid) {
-        cmp.find("calculationName").showHelpMessageIfInvalid();
-        return;
-      }
+      if (!cmp.find("basicInfoSection").validate()) return;
     }
     if (s == 2) {
       console.log("jsem ve stepu 2");
@@ -50,8 +44,8 @@
     if (s == 8) {
       h.getSelectedRiders(cmp);
     }
-    var child = cmp.find("isChild").get("v.checked");
-    var secondInsured = cmp.find("isSecond").get("v.checked");
+    const child = cmp.get("v.NNCalculation.Has_Children__c");
+    const secondInsured = cmp.get("v.NNCalculation.Has_Second_Insured__c");
     if (!child || !secondInsured) {
       if (!child && s == 5) {
         s += 1;
@@ -110,8 +104,9 @@
     if (s == 1) {
       return;
     }
-    var child = cmp.find("isChild").get("v.checked");
-    var secondInsured = cmp.find("isSecond").get("v.checked");
+    const child = cmp.get("v.NNCalculation.Has_Children__c");
+    const secondInsured = cmp.get("v.NNCalculation.Has_Second_Insured__c");
+
     console.log("child " + child + " secondInsured " + secondInsured);
     if (!child || !secondInsured) {
       console.log("jsem in " + s);

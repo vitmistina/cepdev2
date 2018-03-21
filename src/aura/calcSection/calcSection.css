@@ -1,6 +1,7 @@
 .THIS {
   background: var(--grey-ultra-light);
   border-radius: 4px;
+  margin-bottom: 24px;
 }
 
 .THIS .header {
@@ -36,8 +37,13 @@
 
 .THIS.open .content {
   display: grid;
+  align-items: flex-start;
   grid-template-columns: repeat(6, 1fr);
   grid-gap: 12px;
+}
+
+.THIS.full .content {
+  grid-template-columns: 1fr;
 }
 
 .THIS.open .content > *.half {

@@ -37,6 +37,21 @@
   color: var(--orange-dark);
 }
 
+/* buttons */
+.THIS .slds-button.slds-button--neutral {
+  color: var(--orange-medium);
+  border: 1px solid var(--orange-medium) !important;
+}
+
+.THIS .slds-button[disabled].slds-button--neutral {
+  color: var(--grey-light);
+  border: 1px solid var(--grey-light) !important;
+}
+
+.THIS .slds-button[disabled].slds-button--neutral:hover {
+  color: var(--grey-light);
+}
+
 /* inputs and labels */
 
 /* label */

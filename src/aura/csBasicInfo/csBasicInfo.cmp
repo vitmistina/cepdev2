@@ -1,25 +1,44 @@
 <aura:component>
+  <!-- passed attributes from parents -->
   <aura:attribute name="calculationName" type="String" />
+  <aura:attribute name="selectedProductCode" type="String" />
+  <aura:attribute name="productOptions" type="List" />
+  <aura:attribute name="paymentFrequency" type="String" />
+  <aura:attribute name="paymentFrequencyOptions" type="List" />
+  <aura:attribute name="insuranceVariant" type="String" />
+  <aura:attribute name="insuranceVariantOptions" type="List" />
+  <aura:attribute name="dateSign" type="Date" />
+  <aura:attribute name="dateStart" type="Date" />
+  <aura:attribute name="isAnonymous" type="Boolean" />
+  <aura:attribute name="hasSecond" type="Boolean" />
+  <aura:attribute name="hasChildren" type="Boolean" />
 
-  <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.calculationName}" required="true"
-    aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" class="third" />
-  <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}"
-    class="third" />
-  <c:calcInputField type="select" name="PaymentFrequency" label="Frekvence plateb" value="{!v.NNCalculation.PaymentFrequency__c}"
-    options="{!v.paymentFrequencyOptions}" class="third" />
+  <!-- methods -->
+  <aura:method name="validate" action="{!c.validate}" />
 
-  <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
-    onchange="{!c.showOrHideRecalculate}" class="third" />
-  <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
-    onchange="{!c.showOrHideRecalculate}" class="third" />
-  <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.NNCalculation.Insurance_Variant__c}"
-    options="{!v.insuranceVariants}" helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
-    class="third" />
+  <!-- XML markup -->
+  <c:calcSection headline="Základné informace">
+    <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.calculationName}" required="true"
+      aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" class="third" />
+    <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.selectedProductCode}" options="{!v.productOptions}"
+      class="third" />
+    <c:calcInputField type="select" name="PaymentFrequency" label="Frekvence plateb" value="{!v.paymentFrequency}" options="{!v.paymentFrequencyOptions}"
+      class="third" />
 
-  <lightning:input type="toggle" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
-    messageToggleActive="Anonymní" messageToggleInactive="S vytvořením klienta" class="third" />
-  <lightning:input type="toggle" label="Pojistit druhou osobu" name="insureSecondPerson" aura:id="isSecond" checked="{!v.NNCalculation.Has_Second_Insured__c}"
-    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
-  <lightning:input type="toggle" label="Pojistit dítě" name="anonymousCalculation" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
-    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+    <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.dateSign}" onchange="{!c.showOrHideRecalculate}"
+      class="third" />
+    <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceStartDate" value="{!v.dateStart}" onchange="{!c.showOrHideRecalculate}"
+      class="third" />
+    <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.insuranceVariant}" options="{!v.insuranceVariantOptions}"
+      helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
+      class="third" />
+
+    <lightning:input type="toggle" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.isAnonymous}"
+      messageToggleActive="Anonymní" messageToggleInactive="S vytvořením klienta" class="third" />
+    <lightning:input type="toggle" label="Pojistit druhou osobu" name="insureSecondPerson" aura:id="isSecond" checked="{!v.hasSecond}"
+      messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+    <lightning:input type="toggle" label="Pojistit dítě" name="anonymousCalculation" aura:id="isChild" checked="{!v.hasChildren}"
+      messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+  </c:calcSection>
+
 </aura:component>

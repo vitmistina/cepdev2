@@ -104,112 +104,61 @@
         />
 
         <c:CalculationStep title="" aura:id="step1" class="slds-form" stepId="1" currentStep="{!v.currentStep}">
-            <c:calcSection headline="Základné informace">
-                <c:csBasicInfo calculationName="{!v.NNCalculation.CalculationName__c}" />
-                <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.NNCalculation.CalculationName__c}"
-                    required="true" aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" class="third"
-                />
-                <c:calcInputField type="select" name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}"
-                    class="third" />
-                <c:calcInputField type="select" name="PaymentFrequency" label="Frekvence plateb" value="{!v.NNCalculation.PaymentFrequency__c}"
-                    options="{!v.paymentFrequencyOptions}" class="third" />
 
-                <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
-                    onchange="{!c.showOrHideRecalculate}" class="third" />
-                <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
-                    onchange="{!c.showOrHideRecalculate}" class="third" />
-                <c:calcInputField type="select" name="insuranceVariant" label="Varianta sazeb pojistného" value="{!v.NNCalculation.Insurance_Variant__c}"
-                    options="{!v.insuranceVariants}" helptext="NN nabízí dvě varianty. Fixní pojistné platí klient pořád stejně. U Flexi platí v méně rizikovém mladším věku nižší pojistné a jak stárne, platí více a více."
-                    class="third" />
+            <c:csBasicInfo aura:id="basicInfoSection" calculationName="{!v.NNCalculation.CalculationName__c}" selectedProductCode="{!v.NNCalculation.Product__c}"
+                productOptions="{!v.productOptions}" paymentFrequency="{!v.NNCalculation.PaymentFrequency__c}" paymentFrequencyOptions="{!v.paymentFrequencyOptions}"
+                insuranceVariant="{!v.NNCalculation.Insurance_Variant__c}" insuranceVariantOptions="{!v.insuranceVariants}" isAnonymous="{!v.NNCalculation.Is_Anonymous__c}"
+                hasSecond="{!v.NNCalculation.Has_Second_Insured__c}" hasChildren="{!v.NNCalculation.Has_Children__c}" dateStart="{!v.NNCalculation.DateStart__c}"
+                dateSign="{!v.NNCalculation.DateSign__c}" />
+        </c:CalculationStep>
 
-                <lightning:input type="toggle" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
-                    messageToggleActive="Anonymní" messageToggleInactive="S vytvořením klienta" class="third" />
-                <lightning:input type="toggle" label="Pojistit druhou osobu" name="insureSecondPerson" aura:id="isSecond" checked="{!v.NNCalculation.Has_Second_Insured__c}"
-                    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
-                <lightning:input type="toggle" label="Pojistit dítě" name="anonymousCalculation" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
-                    messageToggleActive="Ne" messageToggleInactive="Ano" class="third" />
+        <c:CalculationStep title="" aura:id="step2" class="slds-hide slds-form" stepId="2" currentStep="{!v.currentStep}">
+            <c:calcSection headline="První pojištěný" class="full">
+                <lightning:accordion activeSectionName="b">
+                    <lightning:accordionSection name="b" label="Pojistník">
+
+                        <c:CalculationFormPerson labelFirstName="Jméno pojistníka" labelLastName="Příjmení pojistníka" labelBirthday="Datum narození pojistníka"
+                            labelEmploymentType="Pracovní poměr pojistníka" acc="{!v.firstInsured}" personType="firstInsured"
+                            employmentTypesInner="{!v.employmentTypes}" aura:id="firstInsuredPersonForm" requiredRecalculate="{!v.recalculateRequired}"
+                            calculation="{!v.NNCalculation}" />
+
+                        <c:CalculationFormProfession labelInput="Zadejte povolání pojistníka" labelSearch="Hledat povolání" acc="{!v.firstInsured}"
+                        />
+
+                        <c:CalculationFormSport labelInput="Zadejte sport, který provozujete" labelSearch="Hledat sport" picklistOptsList="{!v.sportOptions}"
+                            acc="{!v.firstInsured}" sportIdentifier="sportFirstInsured" />
+
+                        <c:CalculationFormIncome acc="{!v.firstInsured}" />
+                    </lightning:accordionSection>
+                </lightning:accordion>
+                <lightning:input type="checkbox" label="Pojistník není první pojištěný" checked="{!v.NNCalculation.Insurer_Is_Not_First_Insured__c}"
+                    name="InsurerNotFirstInsured" aura:id="InsurerNotFirstInsured" onchange="{!c.isNotFirstChanged}" />
+
+            </c:calcSection>
+            <c:calcSection headline="První pojištěný" class="full">
+                <lightning:accordion activeSectionName="a" aura:id="insuredSection" class="slds-hide">
+                    <lightning:accordionSection name="a" label="Pojištěný">
+                        <c:CalculationFormPerson labelFirstName="Jméno" labelLastName="Příjmení" labelBirthday="Datum narození" labelEmploymentType="Pracovní poměr"
+                            acc="{!v.policyHolder}" personType="policyHolder" employmentTypesInner="{!v.employmentTypes}" requiredRecalculate="{!v.recalculateRequired}"
+                            calculation="{!v.NNCalculation}" />
+
+
+                        <c:CalculationFormProfession labelInput="Zadejte povolání pojištěného" labelSearch="Hledat povolání" />
+                    </lightning:accordionSection>
+                </lightning:accordion>
             </c:calcSection>
         </c:CalculationStep>
 
+        <div class="slds-text-align_right slds-p-top_small">
+            <lightning:button label="Předchozí" disabled="true" aura:id="prev" onclick="{!c.prev}" />
+            <aura:if isTrue="{!!v.recalculateRequired}">
+                <lightning:button label="Další" variant="brand" aura:id="next" onclick="{!c.next}" />
+            </aura:if>
+        </div>
+
 
         <div class="slds-size_1-of-1 slds-medium-size_2-of-3 slds-large-size_2-of-3 slds-p-horizontal_small">
-            <lightning:input type="checkbox" label="Anonymní kalkulace" name="anonymousCalculation" aura:id="isAnonymous" checked="{!v.NNCalculation.Is_Anonymous__c}"
-            />
             <div class="calculationMain">
-                <c:CalculationStep title="" aura:id="step1" class="slds-form" stepId="1" currentStep="{!v.currentStep}">
-                    <lightning:input type="text" label="Název kalkulace" name="calculationName" value="{!v.NNCalculation.CalculationName__c}"
-                        required="true" aura:id="calculationName" messageWhenValueMissing="Vyplňte název kalkulace" />
-                    <lightning:select label="Speciální skupina" name="SpecialGroup">
-                        <aura:iteration items="{!v.specialGroups}" var="option">
-                            <option value="{!option.value}">{!option.label}</option>
-                        </aura:iteration>
-                    </lightning:select>
-                    <c:calcSelectField name="Product" label="Produkt" value="{!v.NNCalculation.Product__c}" options="{!v.productOptions}" />
-                    <div class="slds-grid">
-                        <div class="slds-col">
-                            <lightning:input type="date" label="Datum plánovaného podpisu" name="PlannedSignDate" value="{!v.NNCalculation.DateSign__c}"
-                                formatter="" onchange="{!c.showOrHideRecalculate}" />
-                        </div>
-                        <div class="slds-col slds-p-left_small">
-                            <lightning:input type="date" label="Datum začátku pojištění" name="InsuranceBeginingDate" value="{!v.NNCalculation.DateStart__c}"
-                                onchange="{!c.showOrHideRecalculate}" />
-                        </div>
-                    </div>
-                    <lightning:select label="Frekvence plateb" name="PaymentFrequention" value="{!v.NNCalculation.PaymentFrequency__c}" onchange="{!c.showOrHideRecalculate}">
-                        <aura:iteration items="{!v.paymentFrequencyOptions}" var="option">
-                            <option value="{!option.value}" selected="{!option.selected}">{!option.label}</option>
-                        </aura:iteration>
-                    </lightning:select>
-                    <lightning:select label="Varianta sazeb pojistného" name="InsuranceVariant" value="{!v.NNCalculation.Insurance_Variant__c}"
-                        onchange="{!c.showOrHideRecalculate}">
-                        <aura:iteration items="{!v.insuranceVariants}" var="option">
-                            <option value="{!option.value}" selected="{!option.selected}">{!option.label}</option>
-                        </aura:iteration>
-                    </lightning:select>
-                    <div class="slds-grid slds-p-top_x-small">
-                        <div class="slds-col">
-                            <lightning:input type="checkbox" label="Pojistit dítě" value="{!v.isChildren}" name="InsureChild" aura:id="isChild" checked="{!v.NNCalculation.Has_Children__c}"
-                            />
-                        </div>
-                        <div class="slds-col">
-                            <lightning:input type="checkbox" label="Pojistit druhou osobu" value="{!v.isSecondInsured}" name="InsureSecondPerson" aura:id="isSecond"
-                                checked="{!v.NNCalculation.Has_Second_Insured__c}" />
-                        </div>
-                    </div>
-                </c:CalculationStep>
-
-                <c:CalculationStep title="První pojištěný - Informace" aura:id="step2" class="slds-hide slds-form" stepId="2" currentStep="{!v.currentStep}">
-
-                    <lightning:accordion activeSectionName="b">
-                        <lightning:accordionSection name="b" label="Pojistník">
-
-                            <c:CalculationFormPerson labelFirstName="Jméno pojistníka" labelLastName="Příjmení pojistníka" labelBirthday="Datum narození pojistníka"
-                                labelEmploymentType="Pracovní poměr pojistníka" acc="{!v.firstInsured}" personType="firstInsured"
-                                employmentTypesInner="{!v.employmentTypes}" aura:id="firstInsuredPersonForm" requiredRecalculate="{!v.recalculateRequired}"
-                                calculation="{!v.NNCalculation}" />
-
-                            <c:CalculationFormProfession labelInput="Zadejte povolání pojistníka" labelSearch="Hledat povolání" acc="{!v.firstInsured}"
-                            />
-
-                            <c:CalculationFormSport labelInput="Zadejte sport, který provozujete" labelSearch="Hledat sport" picklistOptsList="{!v.sportOptions}"
-                                acc="{!v.firstInsured}" sportIdentifier="sportFirstInsured" />
-
-                            <c:CalculationFormIncome acc="{!v.firstInsured}" />
-                        </lightning:accordionSection>
-                    </lightning:accordion>
-                    <lightning:input type="checkbox" label="Pojistník není první pojištěný" checked="{!v.NNCalculation.Insurer_Is_Not_First_Insured__c}"
-                        name="InsurerNotFirstInsured" aura:id="InsurerNotFirstInsured" onchange="{!c.isNotFirstChanged}" />
-                    <lightning:accordion activeSectionName="a" aura:id="insuredSection" class="slds-hide">
-                        <lightning:accordionSection name="a" label="Pojištěný">
-                            <c:CalculationFormPerson labelFirstName="Jméno" labelLastName="Příjmení" labelBirthday="Datum narození" labelEmploymentType="Pracovní poměr"
-                                acc="{!v.policyHolder}" personType="policyHolder" employmentTypesInner="{!v.employmentTypes}"
-                                requiredRecalculate="{!v.recalculateRequired}" calculation="{!v.NNCalculation}" />
-
-
-                            <c:CalculationFormProfession labelInput="Zadejte povolání pojištěného" labelSearch="Hledat povolání" />
-                        </lightning:accordionSection>
-                    </lightning:accordion>
-                </c:CalculationStep>
 
 
                 <c:CalculationStep title="První pojištěný - Výběr komponenty" aura:id="step3" class="slds-hide slds-form" stepId="3">
@@ -349,12 +298,7 @@
                     </aura:iteration>
                 </c:CalculationStep>
 
-                <div class="slds-text-align_right slds-p-top_small">
-                    <lightning:button label="Předchozí" disabled="true" aura:id="prev" onclick="{!c.prev}" />
-                    <aura:if isTrue="{!!v.recalculateRequired}">
-                        <lightning:button label="Další" variant="brand" aura:id="next" onclick="{!c.next}" />
-                    </aura:if>
-                </div>
+
             </div>
         </div>
 
